@@ -1,0 +1,21 @@
+services:
+  api:
+    build: .
+    container_name: "api"
+    environment:
+      WORKER: 1
+    ports:
+      - "5000:8000"
+  mysql:
+    container_name: "db"
+    image: "mysql:8"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "wanted"
+    ports:
+      - "5306:3306"
+    volumes:
+      - my-datavolume:/var/lib/mysql
+
+volumes:
+  my-datavolume:

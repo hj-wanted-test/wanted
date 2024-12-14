@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "wanted"
+version = "0.1.0"
+description = ""
+authors = ["HyeongJoo Kwon <kwonhyeongjoo@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "3.12.2"
+fastapi = {extras = ["standard"], version = "^0.115.6"}
+dependency-injector = "^4.44.0"
+pydantic-settings = "^2.7.0"
+sqlalchemy = "^2.0.36"
+sqlalchemy-utils = "^0.41.2"
+pymysql = "^1.1.1"
+gunicorn = "^23.0.0"
+cryptography = "^44.0.0"
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.13.2"
+black = "^24.10.0"
+flake8 = "^7.1.1"
+pytest = "^8.3.4"
+pandas = "^2.2.3"
