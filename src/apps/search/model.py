@@ -16,6 +16,8 @@ def compile_ft(elem, compiler, **kw):
 
 
 class KeywordCompany(DBModel):
+    """회사 키워드 테이블(FullText 검색)"""
+
     __tablename__ = "keyword_company"
 
     id = Column(
@@ -35,6 +37,8 @@ class KeywordCompany(DBModel):
 
 
 class KeywordTag(DBModel):
+    """태그 키워드 테이블"""
+
     __tablename__ = "keyword_tag"
 
     id = Column(Integer, primary_key=True, autoincrement=True, name="keyword_tag_id")

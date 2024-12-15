@@ -1,7 +1,6 @@
 from apps.companies.dto import CompanyRequestDto, CompanyResponseDto, CompanyTagNameDto
 from apps.companies.model import Company
 from apps.companies.repository.company_repository import CompanyRepository
-from apps.companies.repository.company_tag_repository import CompanyTagRepository
 from apps.companies.service.tag_service import TagService
 from apps.search.model import KeywordCompany, KeywordTag
 from apps.search.repository.keyword_company_repository import KeywordCompanyRepository
@@ -19,7 +18,7 @@ class CompanyService:
         self.company_repository = company_repository
         self.keyword_company_repository = keyword_company_repository
 
-    def create_company(self, request: CompanyRequestDto):
+    def create_company(self, request: CompanyRequestDto) -> None:
         """
         회사 생성
         """
@@ -46,7 +45,13 @@ class CompanyService:
             company_id=company.id, tags=request.tags
         )
 
-    def find_company_by_keyword(self, company_name: str, lang: str):
+    def find_company_by_keyword(
+        self, company_name: str, lang: str
+    ) -> tuple[str, int, str]:
+        """
+        회사명으로 검색하고, 사명(검색어), 회사ID, 사명(목적 언어)을 반환한다
+        """
+
         keyword_company = self.keyword_company_repository.find_company_name(
             company_name=company_name, lang=lang
         )
@@ -55,16 +60,29 @@ class CompanyService:
 
         return keyword_company
 
-    def get_company_by_name(self, company_name: str, lang: str):
-        company_name, company_id, find_company_name = self.find_company_by_keyword(company_name=company_name, lang=lang)
+    def get_company_by_name(self, company_name: str, lang: str) -> CompanyResponseDto:
+        """
+        요청한 언어로 회사명과 태그를 반환한다
+        """
+        company_name, company_id, find_company_name = self.find_company_by_keyword(
+            company_name=company_name, lang=lang
+        )
 
         return CompanyResponseDto(
             company_name=company_name or find_company_name,
             tags=self.tag_service.get_tags_and_lang(company_id=company_id, lang=lang),
         )
 
-    def add_tags(self, company_name: str, tags: list[CompanyTagNameDto], lang: str):
-        company_name, company_id, find_company_name = self.find_company_by_keyword(company_name=company_name, lang=lang)
+    def add_tags(
+        self, company_name: str, tags: list[CompanyTagNameDto], lang: str
+    ) -> CompanyResponseDto:
+        """
+        회사에 태그를 추가한다
+        """
+
+        company_name, company_id, find_company_name = self.find_company_by_keyword(
+            company_name=company_name, lang=lang
+        )
 
         self.tag_service.associate_tags_to_company(company_id=company_id, tags=tags)
 
@@ -73,8 +91,16 @@ class CompanyService:
             tags=self.tag_service.get_tags_and_lang(company_id=company_id, lang=lang),
         )
 
-    def delete_tag(self, company_name: str, tag_name: str, lang: str):
-        company_name, company_id, find_company_name = self.find_company_by_keyword(company_name=company_name, lang=lang)
+    def delete_tag(
+        self, company_name: str, tag_name: str, lang: str
+    ) -> CompanyResponseDto:
+        """
+        회사의 태그를 삭제한다
+        """
+
+        company_name, company_id, find_company_name = self.find_company_by_keyword(
+            company_name=company_name, lang=lang
+        )
 
         tags: list[KeywordTag] = self.tag_service.find_tag(tag_name=tag_name)
         self.tag_service.dissociate_tags_to_company(company_id=company_id, tag_ids=tags)

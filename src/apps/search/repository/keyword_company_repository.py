@@ -15,7 +15,11 @@ class KeywordCompanyRepository(Repository):
 
     __table__ = KeywordCompany
 
-    def find_company_name(self, company_name, lang):
+    def find_company_name(self, company_name, lang) -> tuple[str, int, str]:
+        """
+        회사명으로 검색하고, 사명(검색어), 회사ID, 사명(목적 언어)을 반환한다
+        """
+
         tbl1 = aliased(KeywordCompany)
         tbl2 = aliased(KeywordCompany)
         query = (
@@ -32,7 +36,11 @@ class KeywordCompanyRepository(Repository):
 
         return res
 
-    def search_company(self, keyword:str, lang:str):
+    def search_company(self, keyword:str, lang:str) -> list[tuple[str, int]]:
+        """
+        검색어로 회사를 검색하고 사명(목적 언어), 회사ID를 반환한다
+        """
+
         tbl1 = aliased(KeywordCompany)
         tbl2 = aliased(KeywordCompany)
         query = (
@@ -46,7 +54,3 @@ class KeywordCompanyRepository(Repository):
         )
 
         return self.fetch_all(query)
-
-    def search_tag(self, keyword:str, lang:str):
-        pass
-

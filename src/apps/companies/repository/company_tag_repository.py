@@ -10,11 +10,12 @@ class CompanyTagRepository(Repository):
     __table__ = CompanyTag
 
     def get_company_tags_by_lang(self, company_id: int, lang: str) -> list[str]:
+        """
+        회사의 태그를 요청한 언어로 반환한다
+        """
 
         query = (
-            select(
-                KeywordTag.tag_name
-            )
+            select(KeywordTag.tag_name)
             .select_from(self.__table__)
             .join(KeywordTag, KeywordTag.id == self.__table__.tag_id)
             .where(self.__table__.company_id == company_id, self.__table__.lang == lang)

@@ -20,7 +20,7 @@ def get_company(
     language: str = Depends(get_wanted_language),
     company_name: str = None,
     company_service: CompanyService = Depends(Provide[Container.company_service]),
-):
+) -> CompanyResponseDto:
     return company_service.get_company_by_name(company_name, language)
 
 
@@ -30,7 +30,7 @@ def create_company(
     request: CompanyRequestDto,
     language: str = Depends(get_wanted_language),
     company_service: CompanyService = Depends(Provide[Container.company_service]),
-):
+) -> CompanyResponseDto:
     try:
         company_service.create_company(request)
 
@@ -51,7 +51,7 @@ def update_company_tags(
     request: list[CompanyTagNameDto] = None,
     language: str = Depends(get_wanted_language),
     company_service: CompanyService = Depends(Provide[Container.company_service]),
-):
+) -> CompanyResponseDto:
     return company_service.add_tags(
         company_name=company_name, tags=request, lang=language
     )
@@ -64,5 +64,5 @@ def delete_company_tag(
     company_name: str = None,
     tag_name: str = None,
     company_service: CompanyService = Depends(Provide[Container.company_service]),
-):
+) -> CompanyResponseDto:
     return company_service.delete_tag(company_name=company_name, tag_name=tag_name, lang=language)

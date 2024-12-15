@@ -1,3 +1,6 @@
+import json
+
+import requests
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -32,6 +35,16 @@ app = create_app()
 
 @app.get("/")
 def read_root():
+    return {"Hello": "World"}
+
+
+@app.get("/data_insert")
+def data_insert():
+    with open("../company_tag_sample.json", "r") as f:
+        for line in f.readlines():
+            r = requests.post("http://localhost:8000/companies", json=json.loads(line))
+            print(r.status_code)
+
     return {"Hello": "World"}
 
 

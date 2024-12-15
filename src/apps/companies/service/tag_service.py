@@ -1,6 +1,7 @@
 from apps.companies.dto import CompanyTagNameDto
 from apps.companies.model import CompanyTag
-from apps.companies.repository.company_tag_repository import CompanyTagRepository
+from apps.companies.repository.company_tag_repository import \
+    CompanyTagRepository
 from apps.search.model import KeywordTag
 from apps.search.repository.keyword_tag_repository import KeywordTagRepository
 
@@ -14,7 +15,13 @@ class TagService:
         self.company_tag_repository = company_tag_repository
         self.keyword_tag_repository = keyword_tag_repository
 
-    def associate_tags_to_company(self, company_id: int, tags: list[CompanyTagNameDto]):
+    def associate_tags_to_company(
+        self, company_id: int, tags: list[CompanyTagNameDto]
+    ) -> None:
+        """
+        회사에 태그를 연결한다
+        """
+
         unique_tags = []
         for tag in tags:
             for name in tag.tag_name.values():
@@ -60,19 +67,31 @@ class TagService:
 
         self.company_tag_repository.save_bulk(new_company_tags, commit=True)
 
-        return True
-
     def get_tags_and_lang(self, company_id: int, lang: str) -> list[str]:
+        """
+        회사의 태그를 요청한 언어로 반환한다.
+        """
+
         tags = self.company_tag_repository.get_company_tags_by_lang(company_id, lang)
+
         return tags
 
     def find_tag(self, tag_name: str) -> list[KeywordTag]:
+        """
+        태그를 검색한다
+        """
+
         tags: list[KeywordTag] = self.keyword_tag_repository.find_all_by(
             KeywordTag.tag_name == tag_name
         )
+
         return tags
 
     def dissociate_tags_to_company(self, company_id: int, tag_ids: list[KeywordTag]):
+        """
+        회사에 태그 연결을 해제한다
+        """
+
         tag_ids = [tag.id for tag in tag_ids]
         self.company_tag_repository.delete_all_by(
             CompanyTag.company_id == company_id,

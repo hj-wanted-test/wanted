@@ -4,6 +4,8 @@ from core.db import DBModel
 
 
 class Company(DBModel):
+    """회사 정보 테이블"""
+
     __tablename__ = "company"
 
     id = Column(Integer, primary_key=True, autoincrement=True, name="company_id")
@@ -11,6 +13,8 @@ class Company(DBModel):
 
 
 class CompanyTag(DBModel):
+    """회사의 태그"""
+
     __tablename__ = "company_tag"
 
     id = Column(Integer, primary_key=True, autoincrement=True, name="company_tag_id")
