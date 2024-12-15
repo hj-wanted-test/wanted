@@ -31,17 +31,14 @@ def create_company(
     language: str = Depends(get_wanted_language),
     company_service: CompanyService = Depends(Provide[Container.company_service]),
 ):
-    try:
-        company_service.create_company(request)
 
-        return CompanyResponseDto(
-            company_name=request.company_name.get(language)
-            or list(request.company_name.values())[0],
-            tags=[tag.tag_name[language] for tag in request.tags],
-        )
-    except Exception as e:
-        print(e)
-        raise DefaultExceptions("Failed to create company")
+    company_service.create_company(request)
+
+    return CompanyResponseDto(
+        company_name=request.company_name.get(language)
+        or list(request.company_name.values())[0],
+        tags=[tag.tag_name[language] for tag in request.tags],
+    )
 
 
 @route.put("/{company_name}/tags")

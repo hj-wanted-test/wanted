@@ -1,7 +1,7 @@
 from sqlalchemy import select, and_
 from sqlalchemy.orm import aliased
 
-from apps.companies.model import CompanyTag
+# from apps.companies.model import CompanyTag
 from apps.search.model import KeywordTag, KeywordCompany
 from core.repository import Repository
 
@@ -16,14 +16,15 @@ class KeywordTagRepository(Repository):
         return find_tags
 
     def search_tag(self, keyword:str, lang:str):
-        query = (
-            select(
-                KeywordCompany.company_name
-            )
-            .select_from(KeywordTag)
-            .join(CompanyTag, and_(KeywordTag.id == CompanyTag.tag_id))
-            .join(KeywordCompany, and_(KeywordCompany.company_id == CompanyTag.company_id, KeywordCompany.lang == lang))
-            .where(KeywordTag.tag_name == keyword)
-        )
-
-        return self.fetch_all(query)
+        # query = (
+        #     select(
+        #         KeywordCompany.company_name
+        #     )
+        #     .select_from(KeywordTag)
+        #     .join(CompanyTag, and_(KeywordTag.id == CompanyTag.tag_id))
+        #     .join(KeywordCompany, and_(KeywordCompany.company_id == CompanyTag.company_id, KeywordCompany.lang == lang))
+        #     .where(KeywordTag.tag_name == keyword)
+        # )
+        #
+        # return self.fetch_all(query)
+        return []

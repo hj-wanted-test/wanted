@@ -5,7 +5,7 @@ from apps.companies.repository.company_tag_repository import CompanyTagRepositor
 from apps.companies.service.tag_service import TagService
 from apps.search.model import KeywordCompany, KeywordTag
 from apps.search.repository.keyword_company_repository import KeywordCompanyRepository
-from core.exception import PageNotFound
+from core.exception import PageNotFound, BadRequest
 
 
 class CompanyService:
@@ -27,24 +27,29 @@ class CompanyService:
         # 회사명은 정의된 언어 중 첫번째로 임의 설정한다(식별을 위해)
         company_name = list(request.company_name.values())[0]
 
+        # 중복 생성 방지
+        is_exists = False
+        try:
+            self.find_company_by_keyword(
+                company_name=company_name,
+                lang=list(request.company_name.keys())[0],
+            )
+            is_exists = True
+        except PageNotFound:
+            pass
+
+        if is_exists:
+            raise BadRequest("Duplicate company name")
+
         company = Company(company_name=company_name)
-        self.company_repository.save(company, commit=True)
 
         # 회사명 검색어용으로 저장한다
-        keyword_company_list = []
         for lang, name in request.company_name.items():
-            keyword_company = KeywordCompany(
-                company_name=name,
-                company_id=company.id,
-                lang=lang,
+            company.languages.append(
+                KeywordCompany(company=company, company_name=name, lang=lang)
             )
-            keyword_company_list.append(keyword_company)
 
-        self.keyword_company_repository.save_bulk(keyword_company_list, commit=True)
-
-        self.tag_service.associate_tags_to_company(
-            company_id=company.id, tags=request.tags
-        )
+        self.tag_service.associate_tags_to_company(company=company, tags=request.tags)
 
     def find_company_by_keyword(self, company_name: str, lang: str):
         keyword_company = self.keyword_company_repository.find_company_name(
@@ -56,7 +61,9 @@ class CompanyService:
         return keyword_company
 
     def get_company_by_name(self, company_name: str, lang: str):
-        company_name, company_id, find_company_name = self.find_company_by_keyword(company_name=company_name, lang=lang)
+        company_name, company_id, find_company_name = self.find_company_by_keyword(
+            company_name=company_name, lang=lang
+        )
 
         return CompanyResponseDto(
             company_name=company_name or find_company_name,
@@ -64,9 +71,11 @@ class CompanyService:
         )
 
     def add_tags(self, company_name: str, tags: list[CompanyTagNameDto], lang: str):
-        company_name, company_id, find_company_name = self.find_company_by_keyword(company_name=company_name, lang=lang)
-
-        self.tag_service.associate_tags_to_company(company_id=company_id, tags=tags)
+        company_name, company_id, find_company_name = self.find_company_by_keyword(
+            company_name=company_name, lang=lang
+        )
+        company = self.company_repository.get_reference_by_id(company_id)
+        self.tag_service.associate_tags_to_company(company=company, tags=tags)
 
         return CompanyResponseDto(
             company_name=company_name or find_company_name,
@@ -74,7 +83,9 @@ class CompanyService:
         )
 
     def delete_tag(self, company_name: str, tag_name: str, lang: str):
-        company_name, company_id, find_company_name = self.find_company_by_keyword(company_name=company_name, lang=lang)
+        company_name, company_id, find_company_name = self.find_company_by_keyword(
+            company_name=company_name, lang=lang
+        )
 
         tags: list[KeywordTag] = self.tag_service.find_tag(tag_name=tag_name)
         self.tag_service.dissociate_tags_to_company(company_id=company_id, tag_ids=tags)

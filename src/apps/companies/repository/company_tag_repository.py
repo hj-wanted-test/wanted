@@ -1,13 +1,13 @@
 from sqlalchemy import select
 
-from apps.companies.model import CompanyTag
+# from apps.companies.model import CompanyTag
 from apps.search.model import KeywordTag
 from core.repository import Repository
 
 
 class CompanyTagRepository(Repository):
 
-    __table__ = CompanyTag
+    # __table__ = CompanyTag
 
     def get_company_tags_by_lang(self, company_id: int, lang: str) -> list[str]:
 

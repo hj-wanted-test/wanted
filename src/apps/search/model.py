@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Constraint, Index, Integer, String
+from sqlalchemy import Column, Constraint, Index, Integer, String, ForeignKey
 from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+# from apps.companies.model import Tag
 from core.db import DBModel
 
 
@@ -22,11 +24,12 @@ class KeywordCompany(DBModel):
         Integer, primary_key=True, autoincrement=True, name="keyword_company_id"
     )
     company_name = Column(String(200), nullable=False)
-    company_id = Column(Integer, nullable=False)
     lang = Column(String(10), nullable=False)
+    company_id: Mapped[int] = mapped_column(ForeignKey("company.company_id"))
+
+    company: Mapped["Company"] = relationship(back_populates="languages")
 
     __table_args__ = (
-        Index("idx_company_id", company_id),
         Fulltext("company_name"),
     )
 

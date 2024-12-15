@@ -32,6 +32,12 @@ class Repository:
         query = self.__table__.select().where(self.__table__.id == id)
         return self.fetch_one(query)
 
+    def get_reference_by_id(self, id: int, table: DBModel=None):
+        _table = table or self.__table__
+        ref = _table()
+        ref.id = id
+        return ref
+
     def find_by(self, *args, **kwargs):# -> DBModel:
         res = self.find_all_by(*args, **kwargs)
         return None if not res else res[0]
@@ -67,6 +73,16 @@ class Repository:
             session.refresh(obj)
 
         return obj
+
+    def save_all(self, objs: list[DBModel], commit: bool = False) -> list[DBModel]:
+        with self.session_factory() as session:
+            for obj in objs:
+                session.add(obj)
+
+            if commit:
+                session.commit()
+
+        return objs
 
     def save_bulk(self, objs: list[DBModel], commit: bool = False) -> list[DBModel]:
         with self.session_factory() as session:
